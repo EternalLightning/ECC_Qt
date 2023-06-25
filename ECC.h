@@ -1,15 +1,16 @@
-//secp256k1: y² ≡ x³ + 7 (MOD 998244353) Ep(0, 7)
+//secp256k1: y² ≡ x³ + 7 (MOD 10000000000037) Ep(0, 7)
 #include <cmath>
+#include "HighPrecision.h"
 
 const int MOD=998244353;
 
-struct expandNum{
-	int a, b;
-	 
-	expandNum operator*(expandNum m){
-		int c=a*a-
-	}
-}
+//struct expandNum{
+//	int a, b;
+//
+//	expandNum operator*(expandNum m){
+//		int c=a*a-
+//	}
+//}
 
 int quickPow(int a, int b){
 	int ret=1;
@@ -46,7 +47,7 @@ int legendre(int a){
 
 struct Point{
 	int x, y;
-	
+
 	Point(int a, int b):x(a), y(b){};
 
 	bool operator==(Point m) const{
@@ -65,14 +66,14 @@ struct Point{
 		else
 			molecule=y-m.y, denominator=x-m.x;
 
-		if(molecule*denominator<0) 
+		if(molecule*denominator<0)
 			flag=true;
 
 		molecule=abs(molecule), denominator=abs(denominator);
 		_gcd=gcd(molecule, denominator);
 		molecule/=_gcd, denominator/=_gcd;
 		invElem=quickPow(denominator, MOD-2);
-		if(flag) 
+		if(flag)
 			molecule=-molecule;
 		lambda=(quickMul(molecule, invElem)%MOD+MOD)%MOD;
 		retx=((quickMul(lambda, lambda)-x-m.x)%MOD+MOD)%MOD;

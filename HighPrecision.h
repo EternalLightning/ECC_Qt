@@ -1,358 +1,276 @@
-#include <cstring>
-#include <fstream>
+#include<vector>
+#include<iostream>
+#include<string>
 
-namespace BigInteger{
-    typedef long long ll;
-    typedef unsigned long long ull;
-    class __int256
-    {
-    private:
-        const static int N=105,base=1e8;
-        int a[N],len,neg;
-        void write(int _a)const{if(_a>9)write(_a/10);putchar((_a%10)|48);}
-        int getlen(int _a)const{int ans=0;while(_a)_a/=10,++ans;return ans;}
-    public:
-        __int256(){len=1,neg=0,memset(a,0,sizeof(a));}
-        __int256(char *s)
-        {
-            memset(a,0,sizeof(a));
-            if(s[0]=='-')
-            {
-                int slen=strlen(s)-1;
-                len=1,neg=1;
-                int k=1;
-                for(int i=1;i<=slen;++i)
-                {
-                    if(k==base)++len,k=1;
-                    a[len]+=k*(s[slen-i+1]^48);
-                    k*=10;
-                }
-            }
-            else
-            {
-                int slen=strlen(s);
-                len=1,neg=0;
-                int k=1;
-                for(int i=1;i<=slen;++i)
-                {
-                    if(k==base)++len,k=1;
-                    a[len]+=k*(s[slen-i]^48);
-                    k*=10;
-                }
-            }
-        }
-        __int256(std::string s)
-        {
-            memset(a,0,sizeof(a));
-            if(s[0]=='-')
-            {
-                int slen=s.size()-1;
-                len=1,neg=1;
-                int k=1;
-                for(int i=1;i<=slen;++i)
-                {
-                    if(k==base)++len,k=1;
-                    a[len]+=k*(s[slen-i+1]^48);
-                    k*=10;
-                }
-            }
-            else
-            {
-                int slen=s.size();
-                len=1,neg=0;
-                int k=1;
-                for(int i=1;i<=slen;++i)
-                {
-                    if(k==base)++len,k=1;
-                    a[len]+=k*(s[slen-i]^48);
-                    k*=10;
-                }
-            }
-        }
-        __int256(const char *s)
-        {
-            memset(a,0,sizeof(a));
-            if(s[0]=='-')
-            {
-                int slen=strlen(s)-1;
-                len=1,neg=1;
-                int k=1;
-                for(int i=1;i<=slen;++i)
-                {
-                    if(k==base)++len,k=1;
-                    a[len]+=k*(s[slen-i+1]^48);
-                    k*=10;
-                }
-            }
-            else
-            {
-                int slen=strlen(s);
-                len=1,neg=0;
-                int k=1;
-                for(int i=1;i<=slen;++i)
-                {
-                    if(k==base)++len,k=1;
-                    a[len]+=k*(s[slen-i]^48);
-                    k*=10;
-                }
-            }
-        }
-        template<typename _Tp>__int256(_Tp x)
-        {
-            len=0;neg=0;
-            memset(a,0,sizeof(a));
-            if(x<0)x=-x,neg=1;
-            int tmp;
-            while((tmp=x/base))
-            {
-                a[++len]=x%base;
-                x=tmp;
-            }
-            a[++len]=x;
-        }
-        void get()
-        {
-            std::string s=std::string();
-            char ch=getchar();
-            while(ch<'0'||ch>'9')
-            {
-                if(ch=='-'&&!s.size())s+='-';
-                ch=getchar();
-            }
-            while(ch>='0'&&ch<='9')s+=ch,ch=getchar();
-            *this=__int256(s);
-        }
-        void print()const
-        {
-            int baselen=getlen(base)-1;
-            if(neg)putchar('-');
-            write(a[len]);
-            for(int i=len-1,tmp;i;--i)
-            {
-                tmp=baselen-getlen(a[i]);
-                while(tmp--)putchar('0');
-                if(a[i])write(a[i]);
-            }
-        }
-        std::string to_string()
-        {
-            std::string res="";
-            int baselen=getlen(base)-1;
-            if(neg)res+="-";
-            std::string tmp1="";int tmp2=a[len];
-            if(!a[len])return "0";
-            while(tmp2)tmp1+=tmp2%10+'0',tmp2/=10;
-            reverse(tmp1.begin(),tmp1.end());res+=tmp1;
-            for(int i=len-1,tmp;i;--i)
-            {
-                tmp=baselen-getlen(a[i]);
-                while(tmp--)res+="0";
-                if(!a[i])continue;
-                tmp1="";tmp2=a[i];
-                while(tmp2)tmp1+=tmp2%10+'0',tmp2/=10;
-                reverse(tmp1.begin(),tmp1.end());res+=tmp1;
-            }
-            return res;
-        }
-        friend std::istream& operator>>(std::istream& input,__int256& x)
-        {
-            x.get();
-            return input;
-        }
-        friend std::ostream& operator<<(std::ostream& output,const __int256& x)
-        {
-            x.print();
-            return output;
-        }
-        bool operator==(const __int256& x)const
-        {
-            if(len!=x.len||neg!=x.neg)return false;
-            for(int i=1;i<=len;++i)if(a[i]!=x.a[i])return false;
-            return true;
-        }
-        bool operator!=(const __int256& x)const{return !(*this==x);}
-        bool operator>(const __int256& x)const
-        {
-            if(neg!=x.neg)return x.neg;
-            if(len!=x.len)return len>x.len;
-            for(int i=len;i;--i)if(a[i]!=x.a[i])return a[i]>x.a[i];
-            return false;
-        }
-        bool operator<(const __int256& x)const
-        {
-            if(neg!=x.neg)return neg;
-            if(len!=x.len)return len<x.len;
-            for(int i=len;i;--i)if(a[i]!=x.a[i])return a[i]<x.a[i];
-            return false;
-        }
-        bool operator>=(const __int256& x)const{return !(*this<x);}
-        bool operator<=(const __int256& x)const{return !(*this>x);}
+using namespace std;
 
+class BigInteger{
+private:
+	// 低位到高位
+	vector<int> nums;
+	// 符号位
+	bool isPositive=1;
+	// 位数
+	int length=0;
+	// nums中的每一个元素代表digit位数据
+	static int digit;
+	static int mod;
+public:
+	using ll=long long;
 
-        __int256 operator-()const{__int256 x(*this);x.neg^=1;return x;}
-        __int256 operator+(const __int256& x)const
-        {
-            if((!neg)&&x.neg)return *this-(-x);
-            if(neg&&(!x.neg))return x-(-*this);
-            __int256 ans=__int256();
-            ans.len=std::max(len,x.len);
-            for(int i=1;i<=ans.len;++i)
-            {
-                ans.a[i]+=a[i]+x.a[i];
-                if(ans.a[i]>=base)ans.a[i]-=base,++ans.a[i+1];
-            }
-            if(ans.a[ans.len+1])++ans.len;
-            if(neg&&x.neg)ans.neg=1;
-            return ans;
-        }
-        __int256 operator+=(const __int256& x){return *this=*this+x;}
-        __int256 operator-(const __int256& x)const 
-        {
-            if((!neg)&&x.neg)return *this+(-x);
-            if(neg&&x.neg)return (-x)-(-*this);
-            if(neg&&(!x.neg))return -((-*this)+x);
-            __int256 ans=__int256();
-            if(*this==x)return ans;
-            if(x>*this)
-            {
-                ans=(x-*this);
-                ans.neg=1;
-                return ans;
-            }
-            ans.len=std::max(len,x.len);
-            for(int i=1;i<=ans.len;++i)
-            {
-                ans.a[i]+=a[i]-x.a[i];
-                if(ans.a[i]<0)ans.a[i]+=base,--ans.a[i+1];
-            }while(ans.len&&!ans.a[ans.len])--ans.len;
-            return ans;
-        }
-        __int256 operator-=(const __int256& x){return *this=*this-x;}
-        __int256 operator*(const __int256& x)const
-        {
-
-            __int256 ans=__int256();
-            if(*this==ans||x==ans)return ans;
-            if(neg!=x.neg)ans.neg=1;
-            ans.len=len+x.len;
-            ull tmp;
-            for(int i=1;i<=len;++i)
-                for(int j=1;j<=x.len;++j)
-            {
-                tmp=1ull*a[i]*x.a[j]+ans.a[i+j-1];
-                if(tmp>=base)
-                {
-                    ans.a[i+j]+=tmp/base;
-                    ans.a[i+j-1]=tmp%base;
-                }
-                else ans.a[i+j-1]=tmp;
-            }while(!ans.a[ans.len])
-                --ans.len;
-            return ans;
-        }
-        __int256 operator*=(const __int256& x){return *this=*this*x;}
-        __int256 operator/(const __int256& X)const
-        {
-            if(X==0)std::cerr<<"Error:divide 0\n",exit(-1);
-            __int256 ans(*this),x(X),tmp(1),lt=__int256();
-            if(neg!=x.neg)ans.neg=1;
-            while(ans>=x) x*=2,tmp*=2;
-            while(tmp.len>1||tmp.a[1])
-            {
-                if(ans>=x) ans-=x,lt+=tmp;
-                x/=2,tmp/=2;
-            }
-            ans=lt;
-            while(ans.len&&!ans.a[ans.len])--ans.len;
-            if(!ans.len)return __int256();
-            return ans;
-        }
-        __int256 operator/=(const __int256& X)
-        {
-            if(X==0)std::cerr<<"Error:divide 0\n",exit(-1);
-            __int256 x(X),tmp(1),lt=__int256();
-            if(neg!=x.neg)neg=1;
-            else neg=0;
-            while(*this>=x) x*=2,tmp*=2;
-            while(tmp.len>1||tmp.a[1])
-            {
-                if(*this>=x) *this-=x,lt+=tmp;
-                x/=2,tmp/=2;
-            }
-            *this=lt;
-            while(len&&!a[len])--len;
-            if(!len)return *this=__int256();
-            return *this;
-        }
-        __int256 operator%(const __int256& X)const
-        {
-            if(X==0)std::cerr<<"Error:mod 0\n",exit(-1);
-            __int256 ans(*this),x(X),tmp(1),lt=__int256();
-            if(neg!=x.neg)ans.neg=1;
-            while(ans>=x) x*=2,tmp*=2;
-            while(tmp.len>1||tmp.a[1])
-            {
-                if(ans>=x) ans-=x,lt+=tmp;
-                x/=2,tmp/=2;
-            }
-            return ans;
-        }
-        __int256 operator%=(const __int256& X)
-        {
-            if(X==0)std::cerr<<"Error:mod 0\n",exit(-1);
-            __int256 x(X),tmp(1),lt=__int256();
-            if(neg!=x.neg)neg=1;
-            else neg=0;
-            while(*this>=x) x*=2,tmp*=2;
-            while(tmp.len>1||tmp.a[1])
-            {
-                if(*this>=x) *this-=x,lt+=tmp;
-                x/=2,tmp/=2;
-            }
-            return *this;
-        }
-
-        template<typename _Tp>operator _Tp()const{return _Tp(a[1]);}
-        template<typename _Tp>__int256 operator+(const _Tp& x)const{return *this+__int256(x);}
-        template<typename _Tp>__int256 operator+=(const _Tp& x){return *this=*this+x;}
-        template<typename _Tp>__int256 operator-(const _Tp& x)const{return *this-__int256(x);}
-        template<typename _Tp>__int256 operator-=(const _Tp& x){return *this=*this-x;}
-        template<typename _Tp>__int256 operator*(const _Tp& x)const{return *this*__int256(x);}
-        template<typename _Tp>__int256 operator*=(const _Tp& x){return *this=*this*x;}
-        template<typename _Tp>__int256 operator/(const _Tp& x)const
-        {
-            if(x==0)std::cerr<<"Error:divide 0\n",exit(-1);
-            __int256 ans=__int256();
-            if(len==1&&x>a[1])return ans;
-            ull res=0;ans.len=len;
-            if(neg!=(x<0))ans.neg=1;
-            for(int i=len;i;--i)
-            {
-                res=res*base+a[i];
-                ans.a[i]=res/x;
-                res%=x;
-            }
-            while(ans.len>1&&!ans.a[ans.len])--ans.len;
-            return ans;
-        }
-        template<typename _Tp>__int256 operator/=(const _Tp& x){return *this=*this/x;}
-        template<typename _Tp>__int256 operator%(const _Tp& x)const
-        {
-            if(x==0)std::cerr<<"Error:mod 0\n",exit(-1);
-            if(len==1&&x>a[1])return *this;
-            ull res=0;
-            for(int i=len;i;--i)
-            {
-                res=res*base+a[i];
-                res%=x;
-            }
-            return res;
-        }
-        template<typename _Tp>__int256 operator%=(const _Tp& x){return *this=*this%x;}
-    };
-    template<typename _Tp>const __int256 operator+(const _Tp& x,const __int256& y){return __int256(x)+y;}
-    template<typename _Tp>const __int256 operator-(const _Tp& x,const __int256& y){return __int256(x)-y;}
-    template<typename _Tp>const __int256 operator*(const _Tp& x,const __int256& y){return __int256(x)*y;}
-    template<typename _Tp>const __int256 operator/(const _Tp& x,const __int256& y){return __int256(x)/y;}
-    template<typename _Tp>const __int256 operator%(const _Tp& x,const __int256& y){return __int256(x)%y;}
+	// 构造函数
+	BigInteger()=default;
+	explicit BigInteger(const string &s);
+	explicit BigInteger(ll a):BigInteger(to_string(a)){}
+	BigInteger(const BigInteger &bInt):nums(bInt.nums), isPositive(bInt.isPositive), length(bInt.length){}
+	BigInteger(BigInteger &&bInt) noexcept:nums(move(bInt.nums)), isPositive(bInt.isPositive), length(bInt.length){}
+	explicit BigInteger(const vector<int> &vec, bool sign=true):nums(vec), isPositive(sign){
+		cutLeadZero();
+	}
+	// 从输入流读取
+	friend istream &operator>>(istream &is, BigInteger &bInt){
+		string s;
+		is>>s;
+		bInt=move(BigInteger(s));
+		return is;
+	}
+	// 输出
+	friend ostream &operator<<(ostream &os, const BigInteger &bInt);
+	// 转换为string
+	explicit operator string() const;
+	// 一元正号
+	const BigInteger &operator+() const{
+		return *this;
+	}
+	// 一元负号
+	BigInteger operator-() const{
+		BigInteger tmp(*this);
+		if(!tmp.isZero())
+			tmp.isPositive=!isPositive;
+		return tmp;
+	}
+	// 比较运算符
+	bool operator<(const BigInteger &bInt) const;
+	bool operator<=(const BigInteger &bInt) const;
+	bool operator==(const BigInteger &bInt) const;
+	// 算数运算符
+	BigInteger operator+(const BigInteger &bInt) const;
+	BigInteger operator-(const BigInteger &bInt) const;
+	BigInteger operator*(const BigInteger &bInt) const;
+	// 除法会返回 商和余数
+	pair<BigInteger, BigInteger> operator/(const BigInteger &bInt) const;
+	int operator[](int idx) const{
+		return nums[idx];
+	}
+	// 赋值运算符
+	BigInteger &operator=(const BigInteger &bInt){
+		if(bInt==*this)
+			return *this;
+		nums=bInt.nums;
+		isPositive=bInt.isPositive;
+		length=bInt.length;
+		return *this;
+	}
+	BigInteger &operator=(BigInteger &&bInt) noexcept{
+		nums=move(bInt.nums);
+		isPositive=bInt.isPositive;
+		length=bInt.length;
+		return *this;
+	}
+	size_t size() const{
+		return nums.size();
+	}
+	void cutLeadZero();
+	bool isZero() const;
+	BigInteger absValue() const{
+		return move(BigInteger(nums));
+	}
+	// 构造10^n n<=0会返回1
+	static BigInteger e(size_t n){
+		if(n<=0)
+			return move(BigInteger(vector<int>(1, 1)));
+		int m=n/digit;
+		n-=m*digit;
+		vector<int> ans(m);
+		string s="1";
+		s+=move(string(n, '0'));
+		ans.push_back(stoi(s));
+		return move(BigInteger(ans));
+	}
 };
+
+int BigInteger::digit=8;        // 8位
+int BigInteger::mod=100000000; // 1e9 可能用mask会更好？
+
+BigInteger::BigInteger(const string &s){
+	int n=s.size(), minIdx=0;
+	if(s[0]=='-')
+		isPositive=false, minIdx=1;
+	else if(s[0]=='+')
+		isPositive=true, minIdx=1;
+	for(int i=n-1;i>=minIdx;i-=digit){
+		int beg=max(minIdx, i-digit+1);
+		nums.push_back(stoi(s.substr(beg, i-beg+1)));
+	}
+	cutLeadZero();
+}
+ostream &operator<<(ostream &os, const BigInteger &bInt){
+	os<<(string)bInt;
+	return os;
+}
+BigInteger::operator string() const{
+	string ans;
+	if(!isPositive)
+		ans+="-";
+	int n=nums.size();
+	for(int i=n-1;i>=0;i--){
+		string s=to_string(nums[i]);
+		if(i!=n-1)
+			ans+=string(digit-s.size(), '0');
+		ans+=s;
+	}
+	return ans;
+}
+bool BigInteger::operator<(const BigInteger &bInt) const{
+	if(isPositive&&!bInt.isPositive)
+		return false;
+	if(!isPositive&&bInt.isPositive)
+		return true;
+	bool flag=true;
+	if(!isPositive)
+		flag=false; // 都为负数
+	if(length<bInt.length)
+		return flag;
+	else if(length>bInt.length)
+		return !flag;
+	int n=size();
+	for(int i=n-1;i>=0;i--){
+		if(nums[i]<bInt[i])
+			return flag;
+		else if(nums[i]>bInt[i])
+			return !flag;
+	}
+	return false;
+}
+bool BigInteger::operator<=(const BigInteger &bInt) const{
+	if(isPositive&&!bInt.isPositive)
+		return false;
+	if(!isPositive&&bInt.isPositive)
+		return true;
+	bool flag=true;
+	if(!isPositive)
+		flag=false; // 都为负数
+	if(length<bInt.length)
+		return flag;
+	else if(length>bInt.length)
+		return !flag;
+	int n=size();
+	for(int i=n-1;i>=0;i--){
+		if(nums[i]<bInt[i])
+			return flag;
+		else if(nums[i]>bInt[i])
+			return !flag;
+	}
+	return true;
+}
+bool BigInteger::operator==(const BigInteger &bInt) const{
+	if(length!=bInt.length)
+		return false;
+	int n=size();
+	for(int i=0;i<n;i++)
+		if(nums[i]!=bInt[i])
+			return false;
+	return true;
+}
+BigInteger BigInteger::operator+(const BigInteger &bInt) const{
+	if(!bInt.isPositive)
+		return *this-(-bInt); // 加上负数 = 减去其绝对值
+	if(!isPositive)
+		return bInt-(-*this); // 负数+正数 = 整数-(-负数)
+	// 要么都正 要么都负
+	vector<int> ans;
+	int n=size(), m=bInt.size(), sum=0, i=0, j=0;
+	while(i<n||j<m||sum){
+		if(i<n)
+			sum+=nums[i++];
+		if(j<m)
+			sum+=bInt[j++];
+		ans.push_back(sum%mod);
+		sum/=mod;
+	}
+	return move(BigInteger(ans, isPositive));
+}
+BigInteger BigInteger::operator-(const BigInteger &bInt) const{
+	if(!bInt.isPositive)
+		return *this+(-bInt); // 减去负数 = 加上其绝对值
+	if(!isPositive)
+		return -((-*this)+bInt); // 负数-正数 = -(-负数 + 正数)
+	if(*this<bInt)
+		return -(bInt-*this);
+	// 只计算大数减去小数
+	vector<int> ans;
+	int i=0, j=0, n=size(), m=bInt.size(), sum=0;
+	while(i<n||j<m||sum){
+		if(i<n)
+			sum+=nums[i++];
+		if(j<m)
+			sum-=bInt[j++];
+		int flag=0;
+		if(sum<0){
+			flag=-1;
+			sum+=mod;
+		}
+		ans.push_back(sum);
+		sum=flag;
+	}
+	return move(BigInteger(ans));
+}
+BigInteger BigInteger::operator*(const BigInteger &bInt) const{
+	int n=size(), m=bInt.size();
+	vector<int> ans(n+m);
+	using ll=long long;
+	for(int i=0;i<n;i++){
+		for(int j=0;j<m;j++){
+			ll tmp=ans[i+j]+nums[i]*1ll*bInt[j];
+			ans[i+j]=tmp%mod;
+			ans[i+j+1]+=tmp/mod;
+		}
+	}
+	return move(BigInteger(ans, isPositive==bInt.isPositive));
+}
+pair<BigInteger, BigInteger> BigInteger::operator/(const BigInteger &bInt) const{
+	BigInteger a=absValue();
+	BigInteger b=bInt.absValue();
+	if(b.isZero())
+		return pair<BigInteger, BigInteger>(*this, move(b));
+	if(a<b)
+		return pair<BigInteger, BigInteger>(move(BigInteger(0)), *this);
+	int len=a.length-b.length+1;
+	string ans;
+	if(isPositive!=bInt.isPositive)
+		ans="-";
+	for(int i=0;i<len;i++){
+		BigInteger tmp=e(len-i-1)*b;
+		int times=0;
+		while(tmp<=a){
+			a=a-tmp;
+			++times;
+		}
+		ans+=times+'0';
+	}
+	a.isPositive=isPositive;
+	return pair<BigInteger, BigInteger>(move(BigInteger(ans)), move(a));
+}
+void BigInteger::cutLeadZero(){
+	while(nums.size()>1&&nums.back()==0)
+		nums.pop_back();
+	if(nums.empty())
+		length=0;
+	else{
+		length=(nums.size()-1)*digit+to_string(nums.back()).size();
+	}
+}
+bool BigInteger::isZero() const{
+	return nums.size()==1&&nums.back()==0;
+}
+

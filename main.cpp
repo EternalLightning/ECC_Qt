@@ -12,5 +12,8 @@
 //}
 
 int main(){
-	encryption("mihoyo", "123456");
+	BigInteger a,b;
+	cin>>a>>b;
+	cout<<a*b<<endl;
+	return 0;
 }
