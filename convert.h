@@ -1,7 +1,7 @@
 #include <fstream>
 #include <cstring>
 #include <direct.h>
-#include "ECC.cpp"
+#include "ECC.h"
 
 bool checkName(const char *name){
 	int len=std::strlen(name);

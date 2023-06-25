@@ -1,7 +1,7 @@
 #include <QApplication>
 #include <QPushButton>
 #include <iostream>
-#include "convert.cpp"
+#include "convert.h"
 
 //int main(int argc, char *argv[]){
 //	QApplication a(argc, argv);
