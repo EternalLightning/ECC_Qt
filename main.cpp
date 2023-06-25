@@ -12,7 +12,5 @@
 //}
 
 int main(){
-	int s;
-	std::cin>>s;
 	encryption("mihoyo", "123456");
 }
