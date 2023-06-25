@@ -57,6 +57,10 @@ struct Point{
 		rety=((lambda*(x-retx)-y)%MOD+MOD)%MOD;
 		return {retx, rety};
 	}
+	Point operator-(Point m){
+		Point tmp(m.x, -m.y);
+		return *this+tmp;
+	}
 	Point operator*(int n){
 		n%=MOD;
 		Point ret(0, 0), tmp=*this;
